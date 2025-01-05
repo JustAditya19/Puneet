@@ -1,0 +1,191 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PuneetVerse</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background-color: #1e1e2f;
+            overflow: hidden;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f8f8f2;
+            position: relative;
+        }
+
+        h1 {
+            color: #ff79c6;
+            font-size: 3rem;
+            text-shadow: 3px 3px 0 #8be9fd, -3px -3px 0 #50fa7b;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .tag {
+            padding: 15px 25px;
+            background-color: #6272a4;
+            color: #f8f8f2;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease-in-out, background-color 0.3s;
+            position: absolute;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        .tag:hover {
+            background-color: #bd93f9;
+            transform: scale(1.1);
+        }
+
+        .pop-out {
+            position: absolute;
+            transition: all 0.5s ease-in-out;
+            transform: scale(0);
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .pop-out video, .pop-out img {
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            border-radius: 15px;
+        }
+
+        .pop-out video {
+            object-fit: contain;
+        }
+
+        .caption {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: #f8f8f2;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Adjust positions to prevent overlapping */
+        .tag:nth-child(1) { top: 10%; left: 10%; }
+        .tag:nth-child(2) { top: 25%; left: 60%; }
+        .tag:nth-child(3) { top: 40%; left: 20%; }
+        .tag:nth-child(4) { top: 55%; left: 75%; }
+        .tag:nth-child(5) { top: 70%; left: 30%; }
+        .tag:nth-child(6) { top: 85%; left: 10%; }
+        .tag:nth-child(7) { top: 60%; left: 55%; }
+        .tag:nth-child(8) { top: 15%; right: 15%; }
+        .tag:nth-child(9) { top: 5%; right: 35%; }
+
+    </style>
+</head>
+<body>
+    <h1>PuneetVerse</h1>
+    <div class="tag" data-media="Puneet/P3.mp4" data-caption="Kyu kia click, bola tha na">Don't Click</div>
+    <div class="tag" data-media="Puneet/P6.mp4">Sach Me Kha Gya</div>
+    <div class="tag" data-media="Puneet/P4.mp4">KYA!?</div>
+    <div class="tag" data-media="Puneet/P5.mp4" data-caption="Cheemaree aadmi ho yaar tum to">Mat Click Kar, Bola hai jab</div>
+    <div class="tag" data-media="Puneet/P1.mp4">Mobile Chahiye Mobile</div>
+    <div class="tag" data-media="Puneet/RDT_20230805_094102.mp4">Overthinking</div>
+    <div class="tag" data-media="Puneet/P2.mp4" data-caption="Tutorial">How To Apply Aloevera On Face</div>
+    <div class="tag" data-media="Puneet/10000000_156188487031330_2410830668538648131_n.mp4">Khatam</div>
+    <div class="tag" data-media="Puneet/puneet superstar mummy _puneetsuperstar _viral _puneet(1080P_HD).mp4">Mama Ke Ghar</div>
+
+    <script>
+        let currentPopOut = null; // Keep track of the currently displayed pop-out
+        let currentVideo = null; // Keep track of the currently playing video
+
+        document.querySelectorAll('.tag').forEach(tag => {
+            tag.addEventListener('click', (event) => {
+                // If a video is currently playing, ignore new clicks
+                if (currentVideo && !currentVideo.ended) {
+                    return;
+                }
+
+                const mediaUrl = tag.getAttribute('data-media');
+                const captionText = tag.getAttribute('data-caption');
+
+                // Close the current pop-out if one exists
+                if (currentPopOut) {
+                    if (currentVideo) {
+                        currentVideo.pause();
+                        currentVideo.src = "";
+                        currentVideo = null;
+                    }
+                    currentPopOut.style.transform = 'translate(-50%, -50%) scale(0)';
+                    setTimeout(() => currentPopOut.remove(), 500);
+                    currentPopOut = null;
+                }
+
+                // Create new pop-out element
+                const popOut = document.createElement('div');
+                popOut.classList.add('pop-out');
+
+                // Determine if it's a GIF or video
+                if (mediaUrl.endsWith('.mp4')) {
+                    const video = document.createElement('video');
+                    video.src = mediaUrl;
+                    video.autoplay = true;
+                    video.loop = false; // Play the video fully
+                    video.controls = false; // Disable controls
+
+                    video.addEventListener('loadeddata', () => {
+                        video.play();
+                    });
+
+                    video.addEventListener('ended', () => {
+                        popOut.style.transform = 'translate(-50%, -50%) scale(0)';
+                        setTimeout(() => popOut.remove(), 500);
+                        currentPopOut = null; // Reset the current pop-out reference
+                        currentVideo = null; // Reset the current video reference
+                    });
+
+                    popOut.appendChild(video);
+                    currentVideo = video; // Set the current video reference
+                } else {
+                    const img = document.createElement('img');
+                    img.src = mediaUrl;
+                    popOut.appendChild(img);
+                }
+
+                // Add caption below the media
+                if (captionText) {
+                    const caption = document.createElement('div');
+                    caption.classList.add('caption');
+                    caption.innerText = captionText;
+                    popOut.appendChild(caption);
+                }
+
+                // Position the pop-out at the center of the screen
+                popOut.style.left = `50%`;
+                popOut.style.top = `50%`;
+                popOut.style.transform = 'translate(-50%, -50%)';
+
+                // Append to the body and animate
+                document.body.appendChild(popOut);
+                setTimeout(() => {
+                    popOut.style.transform = 'translate(-50%, -50%) scale(1)';
+                }, 10);
+
+                // Update the current pop-out reference
+                currentPopOut = popOut;
+            });
+        });
+    </script>
+</body>
+</html>
